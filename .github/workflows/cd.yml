@@ -1,0 +1,73 @@
+name: CD to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install frontend dependencies
+      run: |
+        if [ -f "package.json" ]; then npm ci; fi
+
+    - name: Run frontend tests (Jest)
+      run: |
+        if [ -f "package.json" ]; then npm test; fi
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy to Azure Web App (staging slot)
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'your-app-name'
+        slot-name: 'staging'
+        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_STAGING }}
+        package: .
+
+    - name: Health Check
+      run: |
+        for i in {1..5}; do
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://your-app-name-staging.azurewebsites.net/health)
+          if [ "$STATUS" -eq 200 ]; then
+            echo "Health check passed"
+            exit 0
+          fi
+          sleep 5
+        done
+        echo "Health check failed"
+        exit 1
+
+    - name: Swap staging to production
+      if: success()
+      run: |
+        az webapp deployment slot swap \
+          --name your-app-name \
+          --resource-group your-resource-group \
+          --slot staging \
+          --target-slot production
