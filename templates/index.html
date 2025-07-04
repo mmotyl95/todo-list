@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+
 <head>
     <title>Lista zadań</title>
     <style>
@@ -7,22 +8,26 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+
         nav {
             background-color: #eee;
             padding: 10px;
             margin-bottom: 20px;
         }
+
         nav a {
             margin-right: 15px;
             text-decoration: none;
             color: #333;
             font-weight: bold;
         }
+
         nav a:hover {
             text-decoration: underline;
         }
     </style>
 </head>
+
 <body>
     <!-- Menu nawigacyjne -->
     <nav>
@@ -38,8 +43,12 @@
     </form>
     <ul>
         {% for task in tasks %}
-            <li>{{ task }} <a href="/delete/{{ loop.index0 }}">Usuń</a></li>
+        <li>{{ task }} <a href="/delete/{{ loop.index0 }}">Usuń</a></li>
         {% endfor %}
     </ul>
+    <nav>
+        <a href="contact.html">Kontakt</a>
+    </nav>
 </body>
+
 </html>
