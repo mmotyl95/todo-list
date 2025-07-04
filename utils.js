@@ -1,21 +1,14 @@
-function validateForm(name, email, message) {
-    const errors = [];
-   
-    if (!name || name.trim().length < 2) {
-    errors.push('Imię musi mieć co najmniej 2 znaki');
-    }
-   
-    if (!email || !email.includes('@')) {
-    errors.push('Nieprawidłowy adres email');
-    }
-   
-    if (!message || message.trim().length < 10) {
-    errors.push('Wiadomość musi mieć co najmniej 10 znaków');
-    }
-   
-    return {
-    isValid: errors.length === 0,
-    errors: errors
-    };
-}
-module.exports = { validateForm };
+/**
+ * @jest-environment jsdom
+ */
+import { addTask } from './todo';
+
+describe('addTask', () => {
+    it('dodaje nowe zadanie do listy', () => {
+        const ul = document.createElement('ul');
+        addTask('Zrobić zakupy', ul);
+
+        expect(ul.children.length).toBe(1);
+        expect(ul.children[0].textContent).toBe('Zrobić zakupy');
+    });
+});
