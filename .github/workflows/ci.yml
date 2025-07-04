@@ -26,5 +26,4 @@ jobs:
       run: npm test
 
     - name: Build Docker image
-      if: exists('Dockerfile')
       run: docker build -t frontend-todo-app .
